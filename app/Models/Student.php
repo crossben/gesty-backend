@@ -11,7 +11,7 @@ class Student extends Model
 {
     use HasFactory, UseUuid, HasSchoolScope;
 
-    protected $fillable = ['school_id', 'class_id', 'name', 'email', 'phone', 'birth_date'];
+    protected $fillable = ['school_id', 'class_id', 'first_name', 'last_name', 'email', 'matricule', 'gender', 'date_of_birth'];
 
     public function school()
     {

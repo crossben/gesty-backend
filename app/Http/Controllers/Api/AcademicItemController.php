@@ -7,6 +7,8 @@ use App\Models\AcademicItem;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\QueryBuilder;
 
+use Spatie\QueryBuilder\AllowedFilter;
+
 class AcademicItemController extends Controller
 {
     public function __construct()
@@ -17,7 +19,12 @@ class AcademicItemController extends Controller
     public function index()
     {
         $items = QueryBuilder::for(AcademicItem::class)
-            ->allowedFilters('title', 'type', 'subject', 'class_id')
+            ->allowedFilters(
+                'title',
+                'subject',
+                AllowedFilter::exact('type'),
+                AllowedFilter::exact('class_id'),
+            )
             ->allowedSorts('title', 'due_date', 'created_at')
             ->paginate();
 

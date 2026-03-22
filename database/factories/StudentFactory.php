@@ -20,14 +20,14 @@ class StudentFactory extends Factory
     public function definition(): array
     {
         return [
-            'school_id' => School::factory(),
-            'class_id' => SchoolClass::factory(),
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
-            'email' => $this->faker->unique()->safeEmail(),
-            'matricule' => strtoupper($this->faker->unique()->bothify('??###??')),
-            'gender' => $this->faker->randomElement(['MASCULIN', 'FEMININ']),
-            'date_of_birth' => $this->faker->date(),
+            'school_id'     => School::factory(),
+            'class_id'      => SchoolClass::factory(),
+            'first_name'    => $this->faker->firstName(),
+            'last_name'     => $this->faker->lastName(),
+            'email'         => $this->faker->unique()->safeEmail(),
+            'matricule'     => strtoupper($this->faker->unique()->bothify('??###??')),
+            'gender'        => $this->faker->randomElement(['MASCULIN', 'FEMININ']),
+            'date_of_birth' => $this->faker->dateTimeBetween('-30 years', '-18 years')->format('Y-m-d'),
         ];
     }
 }
