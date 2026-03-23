@@ -130,6 +130,62 @@ class AIController extends Controller
     }
 
     /**
+     * Analyzes all school schedules for conflicts and quality issues.
+     */
+    public function analyzeScheduleConflicts(Request $request)
+    {
+        $user = Auth::user();
+        $schedules = \App\Models\Schedule::with('schoolClass')
+            ->where('school_id', $user->school_id)
+            ->where('is_active', true)
+            ->get();
+
+        if ($schedules->isEmpty()) {
+            return response()->json([
+                'error' => true,
+                'message' => "Aucun emploi du temps trouvé pour cette école.",
+            ], 404);
+        }
+
+        // Format for AI service
+        $payload = $schedules->map(function ($s) {
+            return [
+                'id'           => $s->id,
+                'class_id'     => $s->class_id,
+                'class_name'   => $s->schoolClass?->name ?? 'Classe inconnue',
+                'subject'      => $s->subject,
+                'day_of_week'  => $s->day_of_week,
+                'start_time'   => $s->start_time,
+                'end_time'     => $s->end_time,
+                'room'         => $s->room,
+                'teacher'      => $s->teacher,
+                'type'         => $s->type,
+            ];
+        })->values()->toArray();
+
+        $aiService = app(AIService::class);
+        $result = $aiService->analyzeScheduleConflicts($payload);
+
+        if (!$result) {
+            return response()->json([
+                'error' => true,
+                'message' => 'Le service d\'analyse IA est inaccessible.',
+            ], 503);
+        }
+
+        // Log to AIReport
+        AIReport::create([
+            'school_id'       => $user->school_id,
+            'class_id'        => null,
+            'type'            => 'SCHEDULE_CONFLICT',
+            'report'          => $result,
+            'recommendations' => $result['conflicts'] ?? [],
+        ]);
+
+        return response()->json($result);
+    }
+
+    /**
      * Formally saves a previously generated item.
      */
     public function saveGeneratedItem(Request $request)

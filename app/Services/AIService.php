@@ -71,4 +71,20 @@ class AIService
             return null;
         }
     }
+
+    public function analyzeScheduleConflicts(array $schedules)
+    {
+        try {
+            Log::info('AI Conflict Analysis: ' . count($schedules) . ' sessions');
+            $response = Http::withHeaders([
+                'X-API-Key' => $this->apiKey,
+            ])->timeout(60)->post($this->baseUrl . '/schedule/analyze-conflicts', $schedules);
+
+            Log::info('AI Conflict Response status: ' . $response->status());
+            return $response->json();
+        } catch (\Exception $e) {
+            Log::error('AI Conflict Analysis Error: ' . $e->getMessage());
+            return null;
+        }
+    }
 }

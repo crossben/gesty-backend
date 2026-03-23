@@ -34,6 +34,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/ai/save-generated', [AIController::class, 'saveGeneratedItem']);
     Route::post('/ai/import-excel', [AIController::class, 'importExcel']);
     Route::get('/ai/history', [AIController::class, 'getHistory']);
+    Route::post('/ai/analyze-conflicts', [AIController::class, 'analyzeScheduleConflicts']);
 
     // Dashboard
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
