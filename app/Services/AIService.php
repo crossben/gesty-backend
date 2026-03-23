@@ -12,19 +12,23 @@ class AIService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.ai.url', 'http://localhost:8000');
+        $this->baseUrl = config('services.ai.url', 'http://localhost:8008');
         $this->apiKey = config('services.ai.key', '');
     }
 
-    public function analyzeClass(string $classId, array $studentsData)
+    public function analyzeClass(string $class_id, array $studentsData)
     {
         try {
+            Log::info('AI Analysis Request for class: ' . $class_id);
             $response = Http::withHeaders([
                 'X-API-Key' => $this->apiKey,
-            ])->post($this->baseUrl . '/analyze-class', [
-                'class_id' => $classId,
+            ])->post($this->baseUrl . '/ai-analysis/analyze-class', [
+                'class_id' => $class_id,
                 'students' => $studentsData,
             ]);
+
+            Log::info('AI Analysis Response size: ' . strlen($response->body()));
+            Log::debug('AI Analysis Response body: ' . $response->body());
 
             return $response->json();
         } catch (\Exception $e) {
@@ -39,7 +43,7 @@ class AIService
             Log::info('AI Generation Request:', $data);
             $response = Http::withHeaders([
                 'X-API-Key' => $this->apiKey,
-            ])->post($this->baseUrl . '/generate-academic', $data);
+            ])->post($this->baseUrl . '/generation/generate-academic', $data);
 
             Log::info('AI Generation Response:', $response->json() ?? []);
 
@@ -53,10 +57,13 @@ class AIService
     public function parseExcel($filePath)
     {
         try {
+            Log::info('AI Excel Parsing Request');
             $response = Http::withHeaders([
                 'X-API-Key' => $this->apiKey,
             ])->attach('file', file_get_contents($filePath), basename($filePath))
-              ->post($this->baseUrl . '/parse-excel');
+              ->post($this->baseUrl . '/parsing/parse-excel');
+
+            Log::info('AI Excel Parsing Response: ' . $response->status());
 
             return $response->json();
         } catch (\Exception $e) {
