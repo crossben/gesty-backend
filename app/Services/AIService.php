@@ -36,9 +36,12 @@ class AIService
     public function generateAcademicItem(array $data)
     {
         try {
+            Log::info('AI Generation Request:', $data);
             $response = Http::withHeaders([
                 'X-API-Key' => $this->apiKey,
             ])->post($this->baseUrl . '/generate-academic', $data);
+
+            Log::info('AI Generation Response:', $response->json() ?? []);
 
             return $response->json();
         } catch (\Exception $e) {

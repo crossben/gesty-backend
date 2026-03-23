@@ -12,21 +12,21 @@ use Illuminate\Support\Facades\Auth;
 
 class AIController extends Controller
 {
-    public function analyzeClass(Request $request, $classId)
+    public function analyzeClass(Request $request, $class_id)
     {
-        $class = SchoolClass::findOrFail($classId);
+        $class = SchoolClass::findOrFail($class_id);
         
         // Mocking students data for now, in real case we would fetch it
         $studentsData = $class->students()->with('grades')->get()->toArray();
 
         // Run synchronously so the dashboard can display results immediately
         $aiService = app(\App\Services\AIService::class);
-        $result = $aiService->analyzeClass($classId, $studentsData);
+        $result = $aiService->analyzeClass($class_id, $studentsData);
 
         // Fallback mock if the FastAPI service is down or fails
         if (!$result) {
             $result = [
-                'classId' => $classId,
+                'classId' => $class_id,
                 'className' => $class->name,
                 'analyzedAt' => now(),
                 'summary' => [ 'averageGrade' => 14.5, 'attendanceRate' => 92, 'passingRate' => 85, 'totalStudents' => count($studentsData) ],
@@ -49,7 +49,7 @@ class AIController extends Controller
 
         \App\Models\AIReport::create([
             'school_id' => $class->school_id,
-            'class_id' => $classId,
+            'class_id' => $class_id,
             'type' => 'CLASS_ANALYSIS',
             'report' => $result['insights'] ?? [],
             'recommendations' => $result['recommendations'] ?? [],
@@ -58,13 +58,35 @@ class AIController extends Controller
         return response()->json($result);
     }
 
+    /**
+     * Map camelCase frontend fields to snake_case backend fields.
+     */
+    private function mapFields(array $data): array
+    {
+        $mappings = [
+            'classId' => 'class_id',
+        ];
+
+        foreach ($mappings as $frontend => $backend) {
+            if (isset($data[$frontend]) && !isset($data[$backend])) {
+                $data[$backend] = $data[$frontend];
+            }
+        }
+
+        return $data;
+    }
+
     public function generateAcademicItem(Request $request)
     {
-        // Normalize input values to lowercase for internal processing and AI Service
-        $request->merge([
-            'type' => strtolower($request->type),
-            'difficulty' => strtolower($request->difficulty),
-        ]);
+        $data = $this->mapFields($request->all());
+
+        // Normalize input values to lowercase
+        if (isset($data['type'])) $data['type'] = strtolower($data['type']);
+        if (isset($data['difficulty'])) $data['difficulty'] = strtolower($data['difficulty']);
+
+        $request->merge($data);
+
+        \Log::debug('AI Generation request raw:', $request->all());
 
         $validated = $request->validate([
             'type' => 'required|in:devoir,examen,projet',
