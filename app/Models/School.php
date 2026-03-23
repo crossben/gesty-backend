@@ -10,7 +10,18 @@ class School extends Model
 {
     use HasFactory, UseUuid;
 
-    protected $fillable = ['name', 'slug'];
+    protected $fillable = ['name', 'slug', 'address', 'phone', 'email', 'website'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($school) {
+            if (!$school->slug) {
+                $school->slug = \Illuminate\Support\Str::slug($school->name);
+            }
+        });
+    }
 
     public function users()
     {

@@ -16,27 +16,6 @@ class GradeController extends Controller
         $this->authorizeResource(Grade::class, 'grade');
     }
 
-    /**
-     * Map camelCase frontend fields to snake_case backend fields.
-     */
-    private function mapFields(array $data): array
-    {
-        $mappings = [
-            'studentId'      => 'student_id',
-            'academicItemId' => 'academic_item_id',
-            'maxScore'       => 'max_score',
-            'gradedAt'       => 'graded_at',
-        ];
-
-        foreach ($mappings as $frontend => $backend) {
-            if (isset($data[$frontend]) && !isset($data[$backend])) {
-                $data[$backend] = $data[$frontend];
-            }
-        }
-
-        return $data;
-    }
-
     public function index()
     {
         $grades = QueryBuilder::for(Grade::class)
@@ -54,26 +33,21 @@ class GradeController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->mapFields($request->all());
-
-        $validated = validator($data, [
+        $validated = $request->validate([
             'student_id'       => 'required|uuid|exists:students,id',
             'academic_item_id' => 'required|uuid|exists:academic_items,id',
             'score'            => 'required|numeric|min:0',
             'max_score'        => 'required|numeric|min:0',
             'comments'         => 'nullable|string',
             'graded_at'        => 'nullable|date',
-        ])->validate();
+        ]);
 
         // Default graded_at to now if not provided
         if (empty($validated['graded_at'])) {
             $validated['graded_at'] = now();
         }
 
-        $grade = Grade::create([
-            ...$validated,
-            'school_id' => Auth::user()->school_id,
-        ]);
+        $grade = Grade::create($validated);
 
         return response()->json($grade->load(['student', 'academicItem']), 201);
     }
@@ -85,14 +59,12 @@ class GradeController extends Controller
 
     public function update(Request $request, Grade $grade)
     {
-        $data = $this->mapFields($request->all());
-
-        $validated = validator($data, [
+        $validated = $request->validate([
             'score'     => 'sometimes|numeric|min:0',
             'max_score' => 'sometimes|numeric|min:0',
             'comments'  => 'nullable|string',
             'graded_at' => 'nullable|date',
-        ])->validate();
+        ]);
 
         $grade->update($validated);
 

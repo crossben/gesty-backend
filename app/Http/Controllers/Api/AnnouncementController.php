@@ -11,39 +11,21 @@ use Spatie\QueryBuilder\AllowedFilter;
 
 class AnnouncementController extends Controller
 {
-    public function index(Request $request)
+    public function __construct()
+    {
+        $this->authorizeResource(Announcement::class, 'announcement');
+    }
+
+    public function index()
     {
         $announcements = QueryBuilder::for(Announcement::class)
             ->allowedFilters(
                 'priority',
-                AllowedFilter::exact('class_id'),
-                AllowedFilter::callback('target_class', function ($query, $value) {
-                    if ($value === 'all') {
-                        $query->whereNull('class_id');
-                    } else {
-                        $query->where('class_id', $value);
-                    }
-                })
+                'class_id'
             )
             ->allowedIncludes('author', 'schoolClass')
             ->latest()
             ->paginate();
-
-        $announcements->getCollection()->transform(function ($announcement) {
-            return [
-                'id' => $announcement->id,
-                'title' => $announcement->title,
-                'content' => $announcement->content,
-                'priority' => $announcement->priority,
-                'authorId' => $announcement->author_id,
-                'authorName' => $announcement->author ? $announcement->author->name : 'System',
-                'targetClass' => $announcement->class_id,
-                'className' => $announcement->schoolClass ? $announcement->schoolClass->name : null,
-                'expiresAt' => $announcement->expires_at,
-                'createdAt' => $announcement->created_at,
-                'updatedAt' => $announcement->updated_at,
-            ];
-        });
 
         return response()->json($announcements);
     }
@@ -51,24 +33,15 @@ class AnnouncementController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:100',
-            'content' => 'required|string|max:1000',
-            'priority' => 'required|in:LOW,NORMAL,HIGH,URGENT',
-            'class_id' => 'nullable|exists:school_classes,id',
+            'title'      => 'required|string|max:100',
+            'content'    => 'required|string|max:1000',
+            'priority'   => 'required|in:LOW,NORMAL,HIGH,URGENT',
+            'class_id'   => 'nullable|exists:school_classes,id',
             'expires_at' => 'nullable|date',
         ]);
 
-        // Map camelCase from frontend to snake_case if needed
-        if ($request->has('targetClass')) {
-            $validated['class_id'] = $request->targetClass;
-        }
-        if ($request->has('expiresAt')) {
-            $validated['expires_at'] = $request->expiresAt;
-        }
-
         $announcement = Announcement::create([
             ...$validated,
-            'school_id' => Auth::user()->school_id,
             'author_id' => Auth::id(),
         ]);
 
@@ -83,20 +56,12 @@ class AnnouncementController extends Controller
     public function update(Request $request, Announcement $announcement)
     {
         $validated = $request->validate([
-            'title' => 'sometimes|required|string|max:100',
-            'content' => 'sometimes|required|string|max:1000',
-            'priority' => 'sometimes|required|in:LOW,NORMAL,HIGH,URGENT',
-            'class_id' => 'nullable|exists:school_classes,id',
+            'title'      => 'sometimes|required|string|max:100',
+            'content'    => 'sometimes|required|string|max:1000',
+            'priority'   => 'sometimes|required|in:LOW,NORMAL,HIGH,URGENT',
+            'class_id'   => 'nullable|exists:school_classes,id',
             'expires_at' => 'nullable|date',
         ]);
-
-        // Map camelCase from frontend to snake_case if needed
-        if ($request->has('targetClass')) {
-            $validated['class_id'] = $request->targetClass;
-        }
-        if ($request->has('expiresAt')) {
-            $validated['expires_at'] = $request->expiresAt;
-        }
 
         $announcement->update($validated);
 

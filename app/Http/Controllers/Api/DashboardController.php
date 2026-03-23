@@ -15,12 +15,12 @@ class DashboardController extends Controller
     public function stats()
     {
         return response()->json([
-            'totalStudents' => Student::count(),
-            'totalClasses' => SchoolClass::count(),
-            'totalAdmins' => 1,
-            'pendingItems' => AcademicItem::where('due_date', '>', now())->count(),
-            'averageGrade' => round(Grade::avg('score') ?? 0, 2),
-            'attendanceRate' => 95,
+            'total_students'      => Student::count(),
+            'total_classes'       => SchoolClass::count(),
+            'total_admins'        => 1,
+            'pending_items'       => AcademicItem::where('due_date', '>', now())->count(),
+            'average_grade'       => round(Grade::avg('score') ?? 0, 2),
+            'attendance_rate'     => 95,
         ]);
     }
 
@@ -60,9 +60,9 @@ class DashboardController extends Controller
         ];
 
         return response()->json([
-            'studentsByLevel' => $studentsByLevel,
-            'performanceBySubject' => $performanceBySubject,
-            'gradesDistribution' => $gradesDistribution
+            'students_by_level'      => $studentsByLevel,
+            'performance_by_subject' => $performanceBySubject,
+            'grades_distribution'    => $gradesDistribution
         ]);
     }
 }
