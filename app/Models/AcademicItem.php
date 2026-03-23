@@ -20,11 +20,19 @@ class AcademicItem extends Model
         'description',
         'due_date',
         'max_score',
+        'difficulty',
+        'status',
+        'is_ai_generated',
+        'ai_content',
     ];
 
     protected $casts = [
         'due_date' => 'datetime',
         'max_score' => 'decimal:2',
+        'difficulty' => 'string',
+        'status' => 'string',
+        'is_ai_generated' => 'boolean',
+        'ai_content' => 'array',
     ];
 
     public function school()

@@ -45,6 +45,10 @@ class IdentifySchoolBySubdomain
             abort(404, "School not found.");
         }
 
+        if (!$school->is_active) {
+            abort(403, "School is locked. Please contact administration.");
+        }
+
         $this->tenantManager->setSchool($school);
 
         return $next($request);

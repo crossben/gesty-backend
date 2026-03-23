@@ -40,7 +40,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/dashboard/charts', [DashboardController::class, 'charts']);
 
-    // School management
+    // Super Admin (B2B Management)
+    Route::get('/super-admin/stats', [\App\Http\Controllers\Api\SuperAdminController::class, 'stats']);
+    Route::apiResource('/super-admin/schools', \App\Http\Controllers\Api\SuperAdminController::class);
+    Route::patch('/super-admin/schools/{school}/toggle', [\App\Http\Controllers\Api\SuperAdminController::class, 'toggleStatus']);
+
+    // School management (Legacy/Fallback)
     Route::get('/schools', function (Request $request) {
         return \App\Models\School::all();
     });

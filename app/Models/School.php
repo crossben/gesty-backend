@@ -10,7 +10,7 @@ class School extends Model
 {
     use HasFactory, UseUuid;
 
-    protected $fillable = ['name', 'slug', 'address', 'phone', 'email', 'website'];
+    protected $fillable = ['name', 'slug', 'address', 'phone', 'email', 'website', 'is_active'];
 
     protected static function boot()
     {

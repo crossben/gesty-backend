@@ -223,6 +223,14 @@ class DatabaseSeeder extends Seeder
             'is_active'     => true,
         ]);
 
-        $this->command->info("✅ Seeded: 1 school, {$admin->name} (admin@gesty.sn), " . count($classes) . " classes, " . count($allStudents) . " students, grades, schedules, " . count($announcementData) . " announcements.");
+        // 9. Create a SUPER_ADMIN for global platform management
+        User::create([
+            'name'      => 'Gesty Super Admin',
+            'email'     => 'superadmin@gesty.sn',
+            'password'  => Hash::make('password'),
+            'school_id' => null, // Super Admins are not tied to a school
+        ])->assignRole('SUPER_ADMIN');
+
+        $this->command->info("✅ Seeded: 1 Super Admin (superadmin@gesty.sn), 2 schools, {$admin->name} (admin@gesty.sn), " . count($classes) . " classes, " . count($allStudents) . " students, grades, schedules, " . count($announcementData) . " announcements.");
     }
 }

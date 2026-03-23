@@ -229,7 +229,9 @@ class AIController extends Controller
             'title' => $aiResult['title'] ?? ($meta['subject'] . ' - ' . $meta['type']),
             'description' => $description,
             'due_date' => now()->addDays(7),
-            'max_score' => (float)($aiResult['totalPoints'] ?? 20.00),
+            'max_score' => (float)($aiResult['total_points'] ?? $aiResult['totalPoints'] ?? 20.00),
+            'is_ai_generated' => true,
+            'ai_content' => $aiResult,
         ]);
     }
 

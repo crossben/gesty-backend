@@ -5,7 +5,9 @@ services:
       dockerfile: Dockerfile
     container_name: gesty_backend
     ports:
-      - "80:80" # Fixed: Map host port 80 to container port 80
+      - "8000"
+    environment:
+      - SEED_DATABASE=false
     env_file:
       - .env
     restart: unless-stopped
