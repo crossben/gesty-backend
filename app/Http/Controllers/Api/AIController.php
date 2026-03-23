@@ -60,6 +60,12 @@ class AIController extends Controller
 
     public function generateAcademicItem(Request $request)
     {
+        // Normalize input values to lowercase for internal processing and AI Service
+        $request->merge([
+            'type' => strtolower($request->type),
+            'difficulty' => strtolower($request->difficulty),
+        ]);
+
         $validated = $request->validate([
             'type' => 'required|in:devoir,examen,projet',
             'level' => 'required|string',
@@ -69,6 +75,8 @@ class AIController extends Controller
         ]);
 
         $validated['school_id'] = Auth::user()->school_id;
+
+        \Log::info('AI Generation requested', $validated);
 
         GenerateAcademicItemJob::dispatch($validated, $request->boolean('save', true));
 

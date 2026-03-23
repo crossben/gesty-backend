@@ -7,8 +7,11 @@ use App\Http\Controllers\Api\AcademicItemController;
 use App\Http\Controllers\Api\GradeController;
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\ScheduleController;
+use App\Http\Controllers\Api\AIController;
+use App\Http\Controllers\Api\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\DashboardController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -23,11 +26,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('grades', GradeController::class);
     Route::apiResource('announcements', AnnouncementController::class);
     Route::apiResource('schedules', ScheduleController::class);
+    Route::apiResource('admins', AdminController::class);
 
     // AI Features
-    Route::post('/ai/analyze-class/{class_id}', [\App\Http\Controllers\Api\AIController::class, 'analyzeClass']);
-    Route::post('/ai/generate-academic-item', [\App\Http\Controllers\Api\AIController::class, 'generateAcademicItem']);
-    Route::post('/ai/import-excel', [\App\Http\Controllers\Api\AIController::class, 'importExcel']);
+    Route::post('/ai/analyze-class/{class_id}', [AIController::class, 'analyzeClass']);
+    Route::post('/ai/generate-academic-item', [AIController::class, 'generateAcademicItem']);
+    Route::post('/ai/import-excel', [AIController::class, 'importExcel']);
     Route::get('/ai/history', function (Request $request) {
         $query = \App\Models\AIReport::orderBy('created_at', 'desc')->with('schoolClass');
         
@@ -61,8 +65,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Dashboard
-    Route::get('/dashboard/stats', [\App\Http\Controllers\Api\DashboardController::class, 'stats']);
-    Route::get('/dashboard/charts', [\App\Http\Controllers\Api\DashboardController::class, 'charts']);
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+    Route::get('/dashboard/charts', [DashboardController::class, 'charts']);
 
     // School management
     Route::get('/schools', function (Request $request) {
