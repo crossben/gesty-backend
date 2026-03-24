@@ -6,8 +6,4 @@ services:
     container_name: gesty_backend
     ports:
       - "8000"
-    environment:
-      - SEED_DATABASE=false
-    env_file:
-      - .env
     restart: unless-stopped

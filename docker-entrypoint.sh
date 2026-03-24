@@ -11,10 +11,10 @@ echo "Running migrations..."
 php artisan migrate --force
 
 # Seed if requested (e.g. via an environment variable)
-if [ "$SEED_DATABASE" = "true" ]; then
+# if [ "$SEED_DATABASE" = "true" ]; then
     echo "Seeding database..."
     php artisan db:seed --force
-fi
+# fi
 
 # Clear and cache configuration
 echo "Caching configuration..."
