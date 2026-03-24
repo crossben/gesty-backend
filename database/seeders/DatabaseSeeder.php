@@ -10,6 +10,7 @@ use App\Models\AcademicItem;
 use App\Models\Grade;
 use App\Models\Announcement;
 use App\Models\Schedule;
+use Spatie\Permission\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,10 +21,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // 0. Create Roles
+        Role::create(['name' => 'SUPER_ADMIN', 'guard_name' => 'web']);
+        Role::create(['name' => 'ADMIN',       'guard_name' => 'web']);
+        Role::create(['name' => 'MANAGER',     'guard_name' => 'web']);
+
         // 1. Create the main school
         $school = School::create([
             'name' => 'Université de Technologie Avancée',
             'slug' => 'uta',
+            'is_active' => true,
         ]);
 
         // 2. Create Admin and Manager users
@@ -33,6 +40,7 @@ class DatabaseSeeder extends Seeder
             'password'  => Hash::make('password'),
             'school_id' => $school->id,
         ]);
+        $admin->assignRole('ADMIN');
 
         $manager = User::create([
             'name'      => 'Jean-Pierre Ndiaye',
@@ -40,6 +48,7 @@ class DatabaseSeeder extends Seeder
             'password'  => Hash::make('password'),
             'school_id' => $school->id,
         ]);
+        $manager->assignRole('MANAGER');
 
         // 3. Create classes with rich data
         $schoolPrefix = 'UTA';   // Used for matricule generation
