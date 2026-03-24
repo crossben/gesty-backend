@@ -8,6 +8,7 @@ bootstrap/cache/*
 .gitignore
 README.md
 Dockerfile
+docker-entrypoint.sh
 docker-compose.yaml
 phpunit.xml
 tests

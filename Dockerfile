@@ -56,11 +56,8 @@ RUN mkdir -p storage/framework/sessions storage/framework/views storage/framewor
 RUN chown -R www-data:www-data /var/www \
     && chmod -R ug+rwx storage bootstrap/cache
 
-# Copy entrypoint script
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
-# port
+# port 
 EXPOSE 80
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+# Consolidated startup command (Migrations -> Config Cache -> Apache)
+CMD ["sh", "-c", "php artisan migrate --force && ([ \"$SEED_DATABASE\" = \"true\" ] && php artisan db:seed --force || true) && php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground"]
