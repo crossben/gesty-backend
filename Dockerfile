@@ -22,7 +22,7 @@ RUN composer dump-autoload --optimize
 # ==================================================
 # Stage 2: Apache runtime
 # ==================================================
-FROM php:8.2-apache
+FROM php:8.3-apache
 
 WORKDIR /var/www
 
@@ -59,5 +59,5 @@ RUN chown -R www-data:www-data /var/www \
 # port 
 EXPOSE 80
 
-# Consolidated startup command (Migrations -> Config Cache -> Apache)
-CMD ["sh", "-c", "php artisan migrate --force && ([ \"$SEED_DATABASE\" = \"true\" ] && php artisan db:seed --force || true) && php artisan config:cache && php artisan route:cache && php artisan view:cache && apache2-foreground"]
+# Start Apache in foreground
+CMD ["apache2-foreground"]
