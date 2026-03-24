@@ -140,7 +140,7 @@ class DatabaseSeeder extends Seeder
                         'academic_item_id' => $item->id,
                         'score'            => min($score, $maxScore),
                         'max_score'        => $maxScore,
-                        'comments'         => rand(0, 1) ? fake()->sentence() : null,
+                        'comments'         => rand(0, 1) ? "test" : null,
                         'graded_at'        => now()->subDays(rand(1, 30)),
                     ]);
                 }
