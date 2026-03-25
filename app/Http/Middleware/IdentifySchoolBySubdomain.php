@@ -19,6 +19,11 @@ class IdentifySchoolBySubdomain
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // 0. Skip for Super Admin global routes
+        if ($request->is('api/super-admin/*')) {
+            return $next($request);
+        }
+
         // 1. Check for explicit header (Path-based or Header-based multi-tenancy)
         $schoolSlug = $request->header('X-School-Slug');
         

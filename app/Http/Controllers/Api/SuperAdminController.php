@@ -18,14 +18,14 @@ class SuperAdminController extends Controller
      */
     public function stats()
     {
-        return response()->json([
+        return response()->json(['data' => [
             'total_schools'  => School::count(),
             'total_students' => Student::withoutGlobalScopes()->count(),
             'total_admins'   => User::whereHas('roles', function($q) {
                 $q->where('name', 'ADMIN');
             })->count(),
             'active_schools' => School::where('is_active', true)->count(),
-        ]);
+        ]]);
     }
 
     /**
@@ -33,7 +33,7 @@ class SuperAdminController extends Controller
      */
     public function index()
     {
-        return School::withCount(['students', 'users'])->get();
+        return response()->json(['data' => School::withCount(['students', 'users'])->get()]);
     }
 
     /**
