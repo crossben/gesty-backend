@@ -14,6 +14,9 @@ class BasePolicy
      */
     protected function belongsToUserSchool(User $user, $model): bool
     {
+        if ($user->hasRole('SUPER_ADMIN')) {
+            return true;
+        }
         return $user->school_id === $model->school_id;
     }
 
