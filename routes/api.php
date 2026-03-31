@@ -15,9 +15,23 @@ use App\Http\Controllers\Api\DashboardController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
+// Student Authentication
+Route::post('/student/login', [\App\Http\Controllers\Api\StudentAuthController::class, 'login']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Student Routes (authenticated as student via Sanctum)
+    Route::prefix('student')->group(function () {
+        Route::get('/me', [\App\Http\Controllers\Api\StudentAuthController::class, 'me']);
+        Route::post('/logout', [\App\Http\Controllers\Api\StudentAuthController::class, 'logout']);
+        Route::get('/schedule', [\App\Http\Controllers\Api\StudentAuthController::class, 'schedule']);
+        Route::get('/academic-items', [\App\Http\Controllers\Api\StudentAuthController::class, 'academicItems']);
+        Route::get('/grades', [\App\Http\Controllers\Api\StudentAuthController::class, 'grades']);
+        Route::get('/announcements', [\App\Http\Controllers\Api\StudentAuthController::class, 'announcements']);
+        Route::post('/fcm-token', [\App\Http\Controllers\Api\StudentAuthController::class, 'updateFcmToken']);
+    });
 
     // Academic Management
     Route::apiResource('classes', SchoolClassController::class);
